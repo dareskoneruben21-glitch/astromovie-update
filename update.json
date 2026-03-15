@@ -1,13 +1,13 @@
 {
-"version": 19,
-"versionName": "18.1.1.0",
-"apk": "https://github.com/dareskoneruben21-glitch/astromovie-update/releases/download/v2/app3520350_2026.apk",
-"size": "31.4 MB",
-"changelog": [
-"Nuevo reproductor optimizado",
-"Mejor velocidad de carga",
-"Corrección de errores",
-"Mejor estabilidad"
-],
-"mensaje": "Nueva versión disponible de AstroMovie"
+ "version": 20,
+ "versionName": "19.1.0.0",
+ "apk": "https://github.com/dareskoneruben21-glitch/astromovie-update/releases/download/v3/app3520350_3375.apk",
+ "size": "31.4 MB",
+ "changelog": [
+  "Nuevo reproductor optimizado",
+  "Mejor velocidad de carga",
+  "Corrección de errores",
+  "Mejor estabilidad"
+ ],
+ "mensaje": "Nueva versión disponible de AstroMovie"
 }
