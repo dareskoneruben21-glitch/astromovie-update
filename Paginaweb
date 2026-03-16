@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Descarga AstroMovie+, la app definitiva para disfrutar de películas y series con una experiencia cinematográfica única.">
+    <meta name="keywords" content="AstroMovie+, películas, series, streaming, app, entretenimiento">
+    <title>AstroMovie+ - Tu Pasión por el Cine y las Series</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0d0d0d, #1f1f1f);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        header {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            background: url('https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9') no-repeat center/cover;
+            background-attachment: fixed;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6));
+        }
+
+        .logo img {
+            width: 180px;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            z-index: 1;
+            text-shadow: 0 0 10px rgba(229, 9, 20, 0.8);
+        }
+
+        p {
+            font-size: 1.3rem;
+            max-width: 700px;
+            margin-bottom: 40px;
+            z-index: 1;
+            line-height: 1.6;
+        }
+
+        .cta-button {
+            background: #e50914;
+            color: #fff;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: buttonGlow 2s infinite ease-in-out;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .cta-button:hover::before {
+            width: 400px;
+            height: 400px;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(229, 9, 20, 0.7);
+        }
+
+        .cta-button:active {
+            transform: scale(0.95);
+        }
+
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+
+        .screenshots {
+            padding: 80px 20px;
+            text-align: center;
+            background: #1a1a1a;
+        }
+
+        .screenshots h2 {
+            font-size: 2.8rem;
+            font-weight: 600;
+            margin-bottom: 50px;
+            color: #e50914;
+            text-shadow: 0 0 5px rgba(229, 9, 20, 0.3);
+        }
+
+        .carousel-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .carousel {
+            display: flex;
+            animation: slide 16s infinite linear;
+            width: calc(300px * 8);
+        }
+
+        .carousel:hover {
+            animation-play-state: paused;
+        }
+
+        .carousel img {
+            width: 300px;
+            height: auto;
+            margin: 0 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            box-shadow: 0 0 15px rgba(229, 9, 20, 0.3);
+        }
+
+        .carousel img:hover {
+            transform: scale(1.05);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 80vh;
+            text-align: center;
+        }
+
+        .modal-content img {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            font-size: 2rem;
+            color: #fff;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: #e50914;
+        }
+
+        .modal-prev, .modal-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            color: #fff;
+            cursor: pointer;
+            padding: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .modal-prev:hover, .modal-next:hover {
+            color: #e50914;
+        }
+
+        .modal-prev { left: 10px; }
+        .modal-next { right: 10px; }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            background: #000;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes buttonGlow {
+            0% { box-shadow: 0 0 10px rgba(229, 9, 20, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(229, 9, 20, 0.8), 0 0 30px rgba(229, 9, 20, 0.4); }
+            100% { box-shadow: 0 0 10px rgba(229, 9, 20, 0.5); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slide {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(-300px * 4)); }
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            p { font-size: 1rem; }
+            .cta-button { padding: 12px 30px; font-size: 1.1rem; }
+            .screenshots h2 { font-size: 2rem; }
+            .modal-content img { max-height: 60vh; }
+            .logo img { width: 140px; }
+            .carousel img { width: 250px; }
+            .carousel { width: calc(250px * 8); }
+            @keyframes slide {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(calc(-250px * 4)); }
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div id="particles-js"></div>
+        <div class="logo">
+            <img src="https://i.postimg.cc/pdjsQdjz/1754394245737.png" alt="AstroMovie+ Logo">
+        </div>
+        <h1>AstroMovie+: Tu Pasión, Nuestra Plataforma</h1>
+        <p>Explora un universo de películas y series con AstroMovie+. Disfruta de un catálogo épico, recomendaciones personalizadas y una experiencia inmersiva en cualquier dispositivo.</p>
+        <button class="cta-button" onclick="window.location.href='https://www.mediafire.com/file/8cylc4aqoqkgfnb/app3520350_9833.apk/file'">Descarga Ahora</button>
+    </header>
+
+    <section class="screenshots">
+        <h2>Vive la Experiencia AstroMovie+</h2>
+        <div class="carousel-container">
+            <div class="carousel">
+                <img src="https://i.ibb.co/qMhh2L3Q/Screenshot-20250807-181740.jpg" alt="Captura 1" onclick="openModal(0)">
+                <img src="https://i.ibb.co/R4ZRSy3S/Screenshot-20250807-181749.jpg" alt="Captura 2" onclick="openModal(1)">
+                <img src="https://i.ibb.co/Xdz4Nkq/Screenshot-20250807-181801.jpg" alt="Captura 3" onclick="openModal(2)">
+                <img src="https://i.ibb.co/Y40Ly9mL/Screenshot-20250807-182408.jpg" alt="Captura 4" onclick="openModal(3)">
+                <img src="https://i.ibb.co/rGXG1wFG/Screenshot-20250807-181725.jpg" alt="Captura 1" onclick="openModal(0)">
+                <img src="https://i.ibb.co/jvQ1xRPb/Screenshot-20250811-184959.jpg" alt="Captura 2" onclick="openModal(1)">
+                <img src="https://i.ibb.co/DBdwx0H/Screenshot-20250811-184936.jpg" alt="Captura 3" onclick="openModal(2)">
+                <img src="https://i.ibb.co/9msQC5S0/Screenshot-20250811-184826.jpg" alt="Captura 4" onclick="openModal(3)">
+            </div>
+        </div>
+    </section>
+
+    <div class="modal" id="screenshot-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">×</span>
+            <span class="modal-prev" onclick="changeImage(-1)">❮</span>
+            <img id="modal-image" src="" alt="Captura de Pantalla">
+            <span class="modal-next" onclick="changeImage(1)">❯</span>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 AstroMovie+. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 100, density: { enable: true, value_area: 800 } },
+                color: { value: ['#e50914', '#ffd700', '#ffffff'] },
+                shape: { type: ['circle', 'star'], stroke: { width: 0 } },
+                opacity: { value: 0.6, random: true },
+                size: { value: 4, random: true },
+                line_linked: { enable: false },
+                move: {
+                    enable: true,
+                    speed: 3,
+                    direction: 'none',
+                    random: true,
+                    straight: false,
+                    out_mode: 'out'
+                }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: { onhover: { enable: true, mode: 'repulse' }, onclick: { enable: true, mode: 'push' }, resize: true },
+                modes: { repulse: { distance: 120, duration: 0.4 }, push: { particles_nb: 3 } }
+            },
+            retina_detect: true
+        });
+
+        const modal = document.getElementById('screenshot-modal');
+        const modalImage = document.getElementById('modal-image');
+        const screenshots = [
+            'https://i.postimg.cc/W3Byj5Hr/Screenshot-2025-03-21-14-07-41-248-com-bearplayer.jpg',
+            'https://i.postimg.cc/W3Byj5Hr/Screenshot-2025-03-21-14-07-41-248-com-bearplayer.jpg',
+            'https://i.postimg.cc/W3Byj5Hr/Screenshot-2025-03-21-14-07-41-248-com-bearplayer.jpg',
+            'https://i.postimg.cc/W3Byj5Hr/Screenshot-2025-03-21-14-07-41-248-com-bearplayer.jpg',
+            'https://i.postimg.cc/W3Byj5Hr/Screenshot-2025-03-21-14-07-41-248-com-bearplayer.jpg',
+            'https://i.postimg.cc/W3Byj5Hr/Screenshot-2025-03-21-14-07-41-248-com-bearplayer.jpg',
+            'https://i.postimg.cc/W3Byj5Hr/Screenshot-2025-03-21-14-07-41-248-com-bearplayer.jpg',
+            'https://i.postimg.cc/W3Byj5Hr/Screenshot-2025-03-21-14-07-41-248-com-bearplayer.jpg'  
+        ];
+        let currentImageIndex = 0;
+
+        function openModal(index) {
+            currentImageIndex = index;
+            modalImage.src = screenshots[currentImageIndex];
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        function changeImage(direction) {
+            currentImageIndex = (currentImageIndex + direction + screenshots.length) % screenshots.length;
+            modalImage.src = screenshots[currentImageIndex];
+        }
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+    </script>
+</body>
+</html>
