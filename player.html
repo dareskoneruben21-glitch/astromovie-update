@@ -76,10 +76,65 @@ video{
     margin-right:5px;
     cursor:pointer;
 }
+
+/* CONTINUAR VIENDO */
+.continue-box{
+    position:absolute;
+    bottom:30px;
+    left:50%;
+    transform:translateX(-50%);
+    background:rgba(0,0,0,0.7);
+    padding:15px 25px;
+    border-radius:15px;
+    z-index:20;
+    display:none;
+    text-align:center;
+}
+
+.continue-btn{
+    margin-top:10px;
+    padding:10px 20px;
+    background:#00ffe1;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+/* INTRO */
+#intro{
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:#000;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:2000;
+}
+
+.logo{
+    font-size:40px;
+    font-weight:bold;
+    color:#00ffe1;
+    letter-spacing:5px;
+    animation:zoom 2s ease forwards;
+}
+
+@keyframes zoom{
+    0%{transform:scale(0.5); opacity:0;}
+    50%{transform:scale(1.2);}
+    100%{transform:scale(1); opacity:1;}
+}
 </style>
 </head>
 
 <body>
+
+<!-- INTRO ASTROMOVIE -->
+<div id="intro">
+  <div class="logo">ASTROMOVIE</div>
+</div>
 
 <div id="loader"><div class="spinner"></div></div>
 
@@ -92,6 +147,13 @@ video{
     </div>
 
     <video id="player" controls playsinline></video>
+
+    <!-- CONTINUAR VIENDO -->
+    <div class="continue-box" id="continueBox">
+        <div>¿Quieres continuar donde te quedaste?</div>
+        <button class="continue-btn" onclick="continuar()">Continuar viendo</button>
+    </div>
+
 </div>
 
 <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
@@ -99,26 +161,24 @@ video{
 <script>
 const params = new URLSearchParams(window.location.search);
 const videoSrc = params.get("video");
-const subtitle = params.get("sub"); // opcional
+const subtitle = params.get("sub");
 
 const video = document.getElementById("player");
+const continueBox = document.getElementById("continueBox");
+
+let savedTime = 0;
 
 // PLAYER
 const player = new Plyr(video, {
     captions: { active: true, update: true }
 });
 
-// HLS soporte
+// HLS
 if(videoSrc && videoSrc.endsWith(".m3u8")){
     if(Hls.isSupported()){
         const hls = new Hls();
         hls.loadSource(videoSrc);
         hls.attachMedia(video);
-
-        hls.on(Hls.Events.MANIFEST_PARSED, function(){
-            video.play();
-        });
-
     } else if(video.canPlayType('application/vnd.apple.mpegurl')){
         video.src = videoSrc;
     }
@@ -137,15 +197,77 @@ if(subtitle){
     video.appendChild(track);
 }
 
+// Recuperar progreso
+video.addEventListener("loadedmetadata", () => {
+    savedTime = localStorage.getItem(videoSrc);
+
+    if(savedTime && savedTime > 5){
+        continueBox.style.display = "block";
+    }
+});
+
+// CONTINUAR
+function continuar(){
+    video.currentTime = savedTime;
+    continueBox.style.display = "none";
+    video.play();
+}
+
 // Guardar progreso
 video.addEventListener("timeupdate", () => {
     localStorage.setItem(videoSrc, video.currentTime);
 });
 
-// Recuperar progreso
-video.addEventListener("loadedmetadata", () => {
-    const saved = localStorage.getItem(videoSrc);
-    if(saved){
+// Fondo
+document.getElementById("bg").style.backgroundImage =
+"url('https://picsum.photos/800/600')";
+
+// Fullscreen
+function toggleFullscreen(){
+    if(!document.fullscreenElement){
+        document.documentElement.requestFullscreen();
+    }else{
+        document.exitFullscreen();
+    }
+}
+
+// Auto fullscreen
+video.addEventListener("play", () => {
+    if(!document.fullscreenElement){
+        document.documentElement.requestFullscreen();
+    }
+});
+
+// Loader
+video.addEventListener("loadeddata", ()=>{
+    document.getElementById("loader").style.display="none";
+});
+</script>
+
+<script>
+// INTRO CONTROL
+window.addEventListener("load", ()=>{
+
+    const intro = document.getElementById("intro");
+
+    setTimeout(()=>{
+        intro.style.opacity = "0";
+        setTimeout(()=>{
+            intro.style.display = "none";
+
+            // iniciar video automáticamente
+            const video = document.getElementById("player");
+            if(video){
+                video.play();
+            }
+
+        }, 500);
+    }, 2000);
+
+});
+</script>
+</body>
+</html>    if(saved){
         video.currentTime = saved;
     }
 });
