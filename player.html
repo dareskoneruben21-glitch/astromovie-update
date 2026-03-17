@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AstroMovie Player</title>
+
+<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css"/>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+<style>
+body{
+    margin:0;
+    background:#0b0b0b;
+    font-family:Arial;
+    color:white;
+}
+
+/* Loader */
+#loader{
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:#000;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+}
+.spinner{
+    width:60px;
+    height:60px;
+    border:5px solid #222;
+    border-top:5px solid #00ffe1;
+    border-radius:50%;
+    animation:spin 1s linear infinite;
+}
+@keyframes spin{
+    100%{transform:rotate(360deg);}
+}
+
+/* Fondo blur */
+.bg{
+    position:absolute;
+    width:100%;
+    height:100%;
+    background-size:cover;
+    filter:blur(30px) brightness(0.3);
+}
+
+/* Player */
+.container{
+    position:relative;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+video{
+    width:100%;
+    max-height:100%;
+}
+
+/* Botones */
+.topbar{
+    position:absolute;
+    top:10px;
+    left:10px;
+    z-index:10;
+}
+.btn{
+    background:rgba(0,0,0,0.6);
+    padding:10px;
+    border-radius:10px;
+    margin-right:5px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div id="loader"><div class="spinner"></div></div>
+
+<div class="container">
+    <div class="bg" id="bg"></div>
+
+    <div class="topbar">
+        <span class="btn" onclick="history.back()">⬅</span>
+        <span class="btn" onclick="toggleFullscreen()">⛶</span>
+    </div>
+
+    <video id="player" controls playsinline></video>
+</div>
+
+<script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const videoSrc = params.get("video");
+const subtitle = params.get("sub"); // opcional
+
+const video = document.getElementById("player");
+
+// PLAYER
+const player = new Plyr(video, {
+    captions: { active: true, update: true }
+});
+
+// HLS soporte
+if(videoSrc && videoSrc.endsWith(".m3u8")){
+    if(Hls.isSupported()){
+        const hls = new Hls();
+        hls.loadSource(videoSrc);
+        hls.attachMedia(video);
+
+        hls.on(Hls.Events.MANIFEST_PARSED, function(){
+            video.play();
+        });
+
+    } else if(video.canPlayType('application/vnd.apple.mpegurl')){
+        video.src = videoSrc;
+    }
+}else{
+    video.src = videoSrc;
+}
+
+// Subtítulos
+if(subtitle){
+    const track = document.createElement("track");
+    track.kind = "subtitles";
+    track.label = "Español";
+    track.srclang = "es";
+    track.src = subtitle;
+    track.default = true;
+    video.appendChild(track);
+}
+
+// Guardar progreso
+video.addEventListener("timeupdate", () => {
+    localStorage.setItem(videoSrc, video.currentTime);
+});
+
+// Recuperar progreso
+video.addEventListener("loadedmetadata", () => {
+    const saved = localStorage.getItem(videoSrc);
+    if(saved){
+        video.currentTime = saved;
+    }
+});
+
+// Fondo dinámico
+document.getElementById("bg").style.backgroundImage =
+"url('https://picsum.photos/800/600')";
+
+// Fullscreen automático
+function toggleFullscreen(){
+    if(!document.fullscreenElement){
+        document.documentElement.requestFullscreen();
+    }else{
+        document.exitFullscreen();
+    }
+}
+
+// Auto fullscreen al iniciar
+video.addEventListener("play", () => {
+    if(!document.fullscreenElement){
+        document.documentElement.requestFullscreen();
+    }
+});
+
+// Casting básico
+if('remote' in video){
+    console.log("Casting disponible");
+}
+
+// Quitar loader
+video.addEventListener("loadeddata", ()=>{
+    document.getElementById("loader").style.display="none";
+});
+</script>
+
+</body>
+</html>
