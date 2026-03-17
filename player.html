@@ -16,6 +16,11 @@ body{
     color:white;
 }
 
+/* 🔥 COLOR NARANJA GLOBAL */
+:root{
+    --plyr-color-main:#ff7b00;
+}
+
 /* Loader */
 #loader{
     position:fixed;
@@ -31,7 +36,7 @@ body{
     width:60px;
     height:60px;
     border:5px solid #222;
-    border-top:5px solid #00ffe1;
+    border-top:5px solid #ff7b00;
     border-radius:50%;
     animation:spin 1s linear infinite;
 }
@@ -77,7 +82,7 @@ video{
     cursor:pointer;
 }
 
-/* CONTINUAR VIENDO */
+/* CONTINUAR */
 .continue-box{
     position:absolute;
     bottom:30px;
@@ -94,7 +99,7 @@ video{
 .continue-btn{
     margin-top:10px;
     padding:10px 20px;
-    background:#00ffe1;
+    background:#ff7b00;
     border:none;
     border-radius:10px;
     cursor:pointer;
@@ -116,7 +121,7 @@ video{
 .logo{
     font-size:40px;
     font-weight:bold;
-    color:#00ffe1;
+    color:#ff7b00;
     letter-spacing:5px;
     animation:zoom 2s ease forwards;
 }
@@ -131,7 +136,6 @@ video{
 
 <body>
 
-<!-- INTRO ASTROMOVIE -->
 <div id="intro">
   <div class="logo">ASTROMOVIE</div>
 </div>
@@ -148,7 +152,6 @@ video{
 
     <video id="player" controls playsinline></video>
 
-    <!-- CONTINUAR VIENDO -->
     <div class="continue-box" id="continueBox">
         <div>¿Quieres continuar donde te quedaste?</div>
         <button class="continue-btn" onclick="continuar()">Continuar viendo</button>
@@ -161,6 +164,7 @@ video{
 <script>
 const params = new URLSearchParams(window.location.search);
 const videoSrc = params.get("video");
+const nextVideo = params.get("next"); // 🔥 siguiente capitulo
 const subtitle = params.get("sub");
 
 const video = document.getElementById("player");
@@ -168,10 +172,7 @@ const continueBox = document.getElementById("continueBox");
 
 let savedTime = 0;
 
-// PLAYER
-const player = new Plyr(video, {
-    captions: { active: true, update: true }
-});
+const player = new Plyr(video);
 
 // HLS
 if(videoSrc && videoSrc.endsWith(".m3u8")){
@@ -186,6 +187,16 @@ if(videoSrc && videoSrc.endsWith(".m3u8")){
     video.src = videoSrc;
 }
 
+// 🔥 AUTO PLAY REAL
+video.muted = true;
+video.setAttribute("autoplay", true);
+
+video.addEventListener("canplay", ()=>{
+    video.play().then(()=>{
+        video.muted = false;
+    }).catch(()=>{});
+});
+
 // Subtítulos
 if(subtitle){
     const track = document.createElement("track");
@@ -197,25 +208,31 @@ if(subtitle){
     video.appendChild(track);
 }
 
-// Recuperar progreso
+// CONTINUAR
 video.addEventListener("loadedmetadata", () => {
     savedTime = localStorage.getItem(videoSrc);
-
     if(savedTime && savedTime > 5){
         continueBox.style.display = "block";
     }
 });
 
-// CONTINUAR
 function continuar(){
     video.currentTime = savedTime;
     continueBox.style.display = "none";
     video.play();
 }
 
-// Guardar progreso
+// GUARDAR
 video.addEventListener("timeupdate", () => {
     localStorage.setItem(videoSrc, video.currentTime);
+});
+
+// 🔥 AUTO SIGUIENTE
+video.addEventListener("ended", ()=>{
+    if(nextVideo){
+        window.location.href =
+        "player.html?video=" + encodeURIComponent(nextVideo);
+    }
 });
 
 // Fondo
@@ -231,13 +248,6 @@ function toggleFullscreen(){
     }
 }
 
-// Auto fullscreen
-video.addEventListener("play", () => {
-    if(!document.fullscreenElement){
-        document.documentElement.requestFullscreen();
-    }
-});
-
 // Loader
 video.addEventListener("loadeddata", ()=>{
     document.getElementById("loader").style.display="none";
@@ -245,9 +255,8 @@ video.addEventListener("loadeddata", ()=>{
 </script>
 
 <script>
-// INTRO CONTROL
+// INTRO
 window.addEventListener("load", ()=>{
-
     const intro = document.getElementById("intro");
 
     setTimeout(()=>{
@@ -255,7 +264,6 @@ window.addEventListener("load", ()=>{
         setTimeout(()=>{
             intro.style.display = "none";
 
-            // iniciar video automáticamente
             const video = document.getElementById("player");
             if(video){
                 video.play();
@@ -263,8 +271,8 @@ window.addEventListener("load", ()=>{
 
         }, 500);
     }, 2000);
-
 });
 </script>
+
 </body>
 </html>
