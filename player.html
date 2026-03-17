@@ -16,6 +16,11 @@ body{
     color:white;
 }
 
+/* COLOR NARANJA PRO */
+:root{
+    --plyr-color-main: #ff7b00;
+}
+
 /* Loader */
 #loader{
     position:fixed;
@@ -31,7 +36,7 @@ body{
     width:60px;
     height:60px;
     border:5px solid #222;
-    border-top:5px solid #00ffe1;
+    border-top:5px solid #ff7b00;
     border-radius:50%;
     animation:spin 1s linear infinite;
 }
@@ -77,7 +82,7 @@ video{
     cursor:pointer;
 }
 
-/* CONTINUAR VIENDO */
+/* CONTINUAR */
 .continue-box{
     position:absolute;
     bottom:30px;
@@ -94,47 +99,16 @@ video{
 .continue-btn{
     margin-top:10px;
     padding:10px 20px;
-    background:#00ffe1;
+    background:#ff7b00;
     border:none;
     border-radius:10px;
     cursor:pointer;
     font-weight:bold;
 }
-
-/* INTRO */
-#intro{
-    position:fixed;
-    width:100%;
-    height:100%;
-    background:#000;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    z-index:2000;
-}
-
-.logo{
-    font-size:40px;
-    font-weight:bold;
-    color:#00ffe1;
-    letter-spacing:5px;
-    animation:zoom 2s ease forwards;
-}
-
-@keyframes zoom{
-    0%{transform:scale(0.5); opacity:0;}
-    50%{transform:scale(1.2);}
-    100%{transform:scale(1); opacity:1;}
-}
 </style>
 </head>
 
 <body>
-
-<!-- INTRO ASTROMOVIE -->
-<div id="intro">
-  <div class="logo">ASTROMOVIE</div>
-</div>
 
 <div id="loader"><div class="spinner"></div></div>
 
@@ -146,6 +120,101 @@ video{
         <span class="btn" onclick="toggleFullscreen()">⛶</span>
     </div>
 
+    <video id="player" controls playsinline></video>
+
+    <div class="continue-box" id="continueBox">
+        <div>¿Quieres continuar donde te quedaste?</div>
+        <button class="continue-btn" onclick="continuar()">Continuar viendo</button>
+    </div>
+
+</div>
+
+<script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const videoSrc = params.get("video");
+const nextVideo = params.get("next"); // 🔥 siguiente capitulo
+
+const video = document.getElementById("player");
+const continueBox = document.getElementById("continueBox");
+
+let savedTime = 0;
+
+const player = new Plyr(video);
+
+// HLS
+if(videoSrc && videoSrc.endsWith(".m3u8")){
+    if(Hls.isSupported()){
+        const hls = new Hls();
+        hls.loadSource(videoSrc);
+        hls.attachMedia(video);
+    } else if(video.canPlayType('application/vnd.apple.mpegurl')){
+        video.src = videoSrc;
+    }
+}else{
+    video.src = videoSrc;
+}
+
+// AUTO PLAY 🔥
+video.setAttribute("autoplay", true);
+video.muted = true;
+
+video.addEventListener("canplay", ()=>{
+    video.play().then(()=>{
+        video.muted = false;
+    }).catch(()=>{});
+});
+
+// CONTINUAR
+video.addEventListener("loadedmetadata", () => {
+    savedTime = localStorage.getItem(videoSrc);
+
+    if(savedTime && savedTime > 5){
+        continueBox.style.display = "block";
+    }
+});
+
+function continuar(){
+    video.currentTime = savedTime;
+    continueBox.style.display = "none";
+    video.play();
+}
+
+// GUARDAR
+video.addEventListener("timeupdate", () => {
+    localStorage.setItem(videoSrc, video.currentTime);
+});
+
+// 🔥 AUTO SIGUIENTE CAPÍTULO
+video.addEventListener("ended", ()=>{
+    if(nextVideo){
+        window.location.href = 
+        "player.html?video=" + encodeURIComponent(nextVideo);
+    }
+});
+
+// Fondo
+document.getElementById("bg").style.backgroundImage =
+"url('https://picsum.photos/800/600')";
+
+// Fullscreen
+function toggleFullscreen(){
+    if(!document.fullscreenElement){
+        document.documentElement.requestFullscreen();
+    }else{
+        document.exitFullscreen();
+    }
+}
+
+// Loader
+video.addEventListener("loadeddata", ()=>{
+    document.getElementById("loader").style.display="none";
+});
+</script>
+
+</body>
+</html>
     <video id="player" controls playsinline></video>
 
     <!-- CONTINUAR VIENDO -->
