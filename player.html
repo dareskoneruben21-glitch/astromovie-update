@@ -229,6 +229,37 @@ const subtitle = params.get("sub");
 const video = document.getElementById("player");
 const continueBox = document.getElementById("continueBox");
 
+const overlayControls = document.getElementById("overlayControls");
+
+// ocultar al reproducir
+video.addEventListener("play", ()=>{
+  overlayControls.style.opacity = "0";
+  overlayControls.style.pointerEvents = "none";
+});
+
+// mostrar al pausar
+video.addEventListener("pause", ()=>{
+  overlayControls.style.opacity = "1";
+  overlayControls.style.pointerEvents = "auto";
+});
+
+// mostrar al tocar pantalla
+let hideTimeout;
+
+video.addEventListener("click", ()=>{
+  overlayControls.style.opacity = "1";
+  overlayControls.style.pointerEvents = "auto";
+
+  clearTimeout(hideTimeout);
+
+  hideTimeout = setTimeout(()=>{
+    if(!video.paused){
+      overlayControls.style.opacity = "0";
+      overlayControls.style.pointerEvents = "none";
+    }
+  }, 2000);
+});
+
 let savedTime = 0;
 
 const player = new Plyr(video);
