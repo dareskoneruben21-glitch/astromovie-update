@@ -414,5 +414,40 @@ video.addEventListener("pause", ()=>{
 });
 </script>
 
+<script>
+// 🔥 AUTO PLAY PRO + SONIDO REAL
+video.muted = true;
+video.volume = 1;
+video.setAttribute("autoplay", true);
+
+video.addEventListener("canplay", ()=>{
+    video.play().then(()=>{
+
+        // 🔥 activar sonido después de iniciar
+        setTimeout(()=>{
+            video.muted = false;
+            video.volume = 1;
+        }, 300);
+
+    }).catch(()=>{});
+});
+
+// 🔥 activar sonido en primer toque (anti bloqueo Android)
+document.addEventListener("click", ()=>{
+    video.muted = false;
+    video.volume = 1;
+}, { once: true });
+
+// 🔥 guardar volumen
+video.addEventListener("volumechange", ()=>{
+    localStorage.setItem("volume", video.volume);
+});
+
+// 🔥 cargar volumen
+const savedVolume = localStorage.getItem("volume");
+if(savedVolume !== null){
+    video.volume = savedVolume;
+}
+</script>
 </body>
 </html>
